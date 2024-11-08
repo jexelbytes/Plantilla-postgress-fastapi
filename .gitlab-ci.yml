@@ -1,0 +1,25 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+          CI_AWS_ECS_CLUSTER: "Fluxsolar-DEV"
+          CI_AWS_ECS_SERVICE: "apicotizadorv3-dev"
+          CI_AWS_ECS_TASK_DEFINITION: "apicotizadorv3-dev"
+          ENV_DEPLOY: "$ENV_DEV"
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+          CI_AWS_ECS_CLUSTER: "Fluxsolar-PRO"
+          CI_AWS_ECS_SERVICE: "apicotizadorv3-pro"
+          CI_AWS_ECS_TASK_DEFINITION: "apicotizadorv3-pro"
+          ENV_DEPLOY: "$ENV_PRO"
+
+default:
+  before_script:
+    - echo "$ENV_DEPLOY" > ./src/.env
+
+include:
+  - template: AWS/Deploy-ECS.gitlab-ci.yml
+    only:
+      refs:
+        - develop
+        - master
